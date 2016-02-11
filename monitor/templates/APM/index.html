@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %} test_title {% endblock %}
+{% block script %}
+<script type="text/JavaScript">
+
+	function loop(t){	
+		setInterval(loadDoc, t);
+	}
+	
+	function loadDoc() {
+		
+			
+		var xhttp;	
+
+	    xhttp = new XMLHttpRequest();
+	    
+	    xhttp.onreadystatechange = function() {
+	    	if (xhttp.readyState == 4 &&
+	    		xhttp.status == 200){
+	    		document.getElementById("demo").innerHTML = xhttp.responseText; 
+	    	}
+	    };
+	    
+	    xhttp.open("GET", "", true);
+	    xhttp.send();
+		  
+	}
+    
+</script>
+{% endblock %}
+
+
+
+{% block content %}
+
+<body onload="JavaScript:loop(1000);">
+	<p id="demo"> cpu_load(%) : {{data}} </p>
+</body>
+
+{% endblock %}
