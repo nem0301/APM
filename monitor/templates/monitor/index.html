@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %} test_title {% endblock %}
+{% block script %}
+<script type="text/JavaScript">
+
+	function loop(t){	
+		setInterval(loadDoc, t);
+	}
+	
+	function loadDoc() {
+		
+			
+		var xhttp;	
+
+	    xhttp = new XMLHttpRequest();
+	    
+	    xhttp.onreadystatechange = function() {
+	    	if (xhttp.readyState == 4 &&
+	    		xhttp.status == 200){
+	    		document.getElementById("system").innerHTML = xhttp.responseText; 
+	    	}
+	    };
+	    
+	    xhttp.open("GET", "ramdesc, python, java", true);
+	    xhttp.send();
+		  
+	}
+    
+</script>
+{% endblock %}
+{% block style %}
+<style>
+ul.list {
+	list-style-type:none;
+}
+ul.list li {
+    display:inline;    
+}
+
+div.system{
+	display:inline;
+}
+
+div.block {
+	margin:10px;
+	width:400px;
+	float: left;
+	padding:10px;
+}
+
+div.cpu {
+	background:yellow;	
+	height:300px;
+}
+
+div.memory {
+	background:skyblue;
+	height:300px;
+}
+
+table{
+	width:300px;
+{#	border: 1px solid black;#}
+{#	border-collapse: collapse;	#}
+}
+
+th.header{
+	text-align:center;
+}
+
+td.value{
+	text-align:right;
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<body onload="JavaScript:loop(1000);">
+	<div class="system", id="system">		
+		<div class="cpu block">
+			<p><b>CORE Infomation</b></p>
+			{% for e in cpus%}
+			<h3> CORE {{e.0}} : {{e.1}}  </h3>
+			{% endfor %}		
+			
+			<p><b>CPU Infomation per process</b></p>
+			
+			<table>
+				<tr>
+					<th class="header">Process</th>
+					<th class="header">Usage of CPU</th>
+				</tr>	
+			
+				{% for p in processes %}
+											
+				<tr>						
+					<td>{{p.0}}</td>
+					<td class="value">{{p.1}} %</td>				
+				</tr>
+				{% endfor %}
+			</table>		
+		</div>	
+		
+	
+		<div class="memory block">
+			<p><b>Memory Infomation</b></p>
+			<table>		
+				<tr>	
+					<th>Total</th>
+					<th>Available</th>
+					<th>Active</th>
+				</tr>
+				<tr>	
+				{% for m in memory %}
+					<td class="value">{{m}} M</td>				
+				{% endfor %}
+				</tr>
+			</table>
+			
+			<p><b>Memory Infomation per process</b></p>
+			<table>
+				<tr>
+					<th class="header">Process</th>
+					<th class="header">RSS</th>
+					<th class="header">VMS</th>
+				</tr>	
+			
+				{% for p in processes %}											
+				<tr>						
+					<td>{{p.0}}</td>					
+					{% for m in p.2%}
+					<td class="value">{{m}} M </td>
+					{% endfor %}				
+				</tr>
+				{% endfor %}
+			</table>		
+		</div>
+	</div>
+	
+</body>
+
+{% endblock %}
+
