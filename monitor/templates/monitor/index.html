@@ -22,7 +22,7 @@
 	    	}
 	    };
 	    
-	    xhttp.open("GET", "ramdesc, python, java", true);
+	    xhttp.open("GET", "/monitor", true);
 	    xhttp.send();
 		  
 	}
@@ -73,6 +73,10 @@ td.value{
 	text-align:right;
 }
 
+table.memory{
+	width:100%;
+}
+
 </style>
 {% endblock %}
 
@@ -98,7 +102,7 @@ td.value{
 				{% for p in processes %}
 											
 				<tr>						
-					<td>{{p.0}}</td>
+					<td><a href="/monitor/{{p.3}}">{{p.0}}</a></td>
 					<td class="value">{{p.1}} %</td>				
 				</tr>
 				{% endfor %}
@@ -116,13 +120,13 @@ td.value{
 				</tr>
 				<tr>	
 				{% for m in memory %}
-					<td class="value">{{m}} M</td>				
+					<td class="value">{{m}}</td>				
 				{% endfor %}
 				</tr>
 			</table>
 			
 			<p><b>Memory Infomation per process</b></p>
-			<table>
+			<table class="memory">
 				<tr>
 					<th class="header">Process</th>
 					<th class="header">RSS</th>
@@ -131,9 +135,9 @@ td.value{
 			
 				{% for p in processes %}											
 				<tr>						
-					<td>{{p.0}}</td>					
+					<td><a href="/monitor/{{p.3}}">{{p.0}}</a></td>					
 					{% for m in p.2%}
-					<td class="value">{{m}} M </td>
+					<td class="value">{{m}}</td>
 					{% endfor %}				
 				</tr>
 				{% endfor %}

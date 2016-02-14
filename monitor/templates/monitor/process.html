@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %} test_title {% endblock %}
+{% block script %}
+<script type="text/JavaScript">
+
+	function loop(t){	
+		setInterval(loadDoc, t);
+	}
+	
+	function loadDoc() {
+		
+			
+		var xhttp;	
+
+	    xhttp = new XMLHttpRequest();
+	    
+	    xhttp.onreadystatechange = function() {
+	    	if (xhttp.readyState == 4 &&
+	    		xhttp.status == 200){
+	    		document.getElementById("system").innerHTML = xhttp.responseText; 
+	    	}
+	    };
+	    
+	    xhttp.open("GET", "", true);
+	    xhttp.send();
+		  
+	}
+    
+</script>
+{% endblock %}
+{% block style %}
+<style>
+ul.list {
+	list-style-type:none;
+}
+ul.list li {
+    display:inline;    
+}
+
+div.system{
+	display:inline;
+}
+
+div.block {
+	margin:10px;
+	width:400px;
+	float: left;
+	padding:10px;
+}
+
+div.cpu {
+	background:yellow;	
+	height:300px;
+}
+
+div.memory {
+	background:skyblue;
+	height:300px;
+}
+
+table{
+	width:300px;
+{#	border: 1px solid black;#}
+{#	border-collapse: collapse;	#}
+}
+
+th.header{
+	text-align:center;
+}
+
+td.value{
+	text-align:right;
+}
+
+table.memory{
+	width:100%;
+}
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+
+<body onload="JavaScript:loop(1000);">
+	<div class="system", id="system">		
+		{{name}}
+	</div>
+	
+</body>
+
+{% endblock %}
+

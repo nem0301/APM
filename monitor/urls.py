@@ -1,8 +1,8 @@
 from django.conf.urls import url
 from . import views
-from views import MonitorView
+from views import MonitorView, ProcessView
 
 urlpatterns = [
-#     url(r'^', views.index, name='index'),
-    url(r'^', MonitorView.as_view(), name='index'),
+    url(r'^$', MonitorView.as_view(), name='index'),
+    url(r'^(?P<pid>[0-9]+)/$', ProcessView.as_view(), name='process'),
     ]     
