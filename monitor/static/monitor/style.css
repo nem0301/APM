@@ -1,0 +1,45 @@
+ul.list {
+	list-style-type:none;
+}
+ul.list li {
+    display:inline;    
+}
+
+div.system{
+	display:inline;
+}
+
+div.block {
+	margin:10px;
+	width:400px;
+	float: left;
+	padding:10px;
+}
+
+div.cpu {
+	background:yellow;	
+	height:300px;
+}
+
+div.memory {
+	background:skyblue;
+	height:300px;
+}
+
+table{
+	width:300px;
+//	border: 1px solid black;
+//	border-collapse: collapse;	
+}
+
+th.header{
+	text-align:center;
+}
+
+td.value{
+	text-align:right;
+}
+
+table.memory{
+	width:100%;
+}

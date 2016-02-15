@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
 
 {% block title %} test_title {% endblock %}
 {% block script %}
@@ -29,59 +30,26 @@
     
 </script>
 {% endblock %}
-{% block style %}
-<style>
-ul.list {
-	list-style-type:none;
-}
-ul.list li {
-    display:inline;    
-}
-
-div.system{
-	display:inline;
-}
-
-div.block {
-	margin:10px;
-	width:400px;
-	float: left;
-	padding:10px;
-}
-
-div.cpu {
-	background:yellow;	
-	height:300px;
-}
-
-div.memory {
-	background:skyblue;
-	height:300px;
-}
-
-table{
-	width:300px;
-{#	border: 1px solid black;#}
-{#	border-collapse: collapse;	#}
-}
-
-th.header{
-	text-align:center;
-}
-
-td.value{
-	text-align:right;
-}
-
-table.memory{
-	width:100%;
-}
-
-</style>
-{% endblock %}
-
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'monitor/style.css' %}" />
+{#	cpus {			#}
+{#		0 : core#	#}
+{#		1 : clock	#}
+{#	}				#}
+
+{#	process {		#}
+{#		0 : name	#}
+{#		1 : cpu%	#}
+{#		2 : memory	#}
+{#		3 : pid		#}
+{#		4 : rss		#}
+{#	}				#}
+
+{#	memory{			#}
+{#		0 : rss / M	#}
+{#		1 : vms / M	#}
+{#	}				#}
 
 <body onload="JavaScript:loop(1000);">
 	<div class="system", id="system">		
@@ -99,8 +67,7 @@ table.memory{
 					<th class="header">Usage of CPU</th>
 				</tr>	
 			
-				{% for p in processes %}
-											
+				{% for p in processes %}							
 				<tr>						
 					<td><a href="/monitor/{{p.3}}">{{p.0}}</a></td>
 					<td class="value">{{p.1}} %</td>				

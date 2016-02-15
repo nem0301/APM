@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load staticfiles %}
+
 
 {% block title %} test_title {% endblock %}
 {% block script %}
@@ -29,63 +31,41 @@
     
 </script>
 {% endblock %}
-{% block style %}
-<style>
-ul.list {
-	list-style-type:none;
-}
-ul.list li {
-    display:inline;    
-}
-
-div.system{
-	display:inline;
-}
-
-div.block {
-	margin:10px;
-	width:400px;
-	float: left;
-	padding:10px;
-}
-
-div.cpu {
-	background:yellow;	
-	height:300px;
-}
-
-div.memory {
-	background:skyblue;
-	height:300px;
-}
-
-table{
-	width:300px;
-{#	border: 1px solid black;#}
-{#	border-collapse: collapse;	#}
-}
-
-th.header{
-	text-align:center;
-}
-
-td.value{
-	text-align:right;
-}
-
-table.memory{
-	width:100%;
-}
-
-</style>
-{% endblock %}
 
 
 {% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'monitor/style.css' %}" />
 
 <body onload="JavaScript:loop(1000);">
-	<div class="system", id="system">		
-		{{name}}
+	<div class="system", id="system">
+		<p> {{name}} </p>
+		<p> {{pid}} </p>
+		<p> {{ppid}} </p>
+		<p> {{exe}} </p>
+		<p> {{cmdline}} </p>
+		<p> {{created}} </p>
+		<p> {{status}} </p>
+		<p>	{{cwd}} </p>
+		<p>	{{username}} </p>
+		<p>	{{uids}} </p>
+		<p>	{{gids}} </p>
+		<p> {{nice}} </p>
+		<p> {{ionice}} </p>
+		<p> {{rlimit}} </p>
+		<p> {{io_counters}} </p>
+		<p> {{num_ctx_switches}} </p>
+		<p> {{num_fds}} </p>
+		<p> {{num_threads}} </p>
+		<p> {{threads}} </p>		
+		<p> {{cpu_times}} </p>
+{#		<p> {{cpu_percent}} </p>#}
+		<p> {{cpu_affinity}} </p>
+		<p> {{memory_info_ex}} </p>
+		<p> {{memory_percent}} </p>
+		<p> {{children}} </p>
+		<p> {{open_files}} </p>
+		<p> {{connections}} </p>
+		<p> {{is_running}} </p>
 	</div>
 	
 </body>
