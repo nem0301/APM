@@ -27,7 +27,7 @@ div.memory {
 }
 
 table{
-	width:300px;
+	width:100%;
 //	border: 1px solid black;
 //	border-collapse: collapse;	
 }
@@ -41,5 +41,9 @@ td.value{
 }
 
 table.memory{
+	width:100%;
+}
+
+table.cpu{
 	width:100%;
 }

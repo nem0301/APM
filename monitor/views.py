@@ -13,24 +13,30 @@ class SyetmeInfomation:
         self.name = 'test'
         self.processes = []
         self.cpus = []
-        self.memory = []        
+        self.memory = {}        
         
     def byCpu(self, item):
-        return item[1]
+        return item['cpu_percent']
     
     def byRam(self, item):
-        return item[4]
+        return item['mem_percent']
         
     def getName(self):
         return self.name
     
     def processUpdate(self):
         pInfo = []
-        for proc in psutil.process_iter():                              
-            memory = []
-            memory.append('{:,}'.format(proc.memory_info().rss / self.mega) + " M (" + "%05.2f" % proc.memory_percent() + "%)")
-            memory.append('{:,}'.format(proc.memory_info().vms / self.mega) + " M")                    
-            pInfo.append([proc.name(), proc.cpu_percent(), memory, proc.pid, proc.memory_info().rss] )
+        for proc in psutil.process_iter():            
+            memory = {'rss' : '{:,}'.format(proc.memory_info().rss / self.mega),
+                      'vms' : '{:,}'.format(proc.memory_info().vms / self.mega), 
+                      }
+            proc = {'name' : proc.name(),
+                    'pid' : proc.pid, 
+                    'cpu_percent' : proc.cpu_percent(), 
+                    'memory' : memory,              
+                    'mem_percent' : "%05.2f" % proc.memory_percent(),
+                    }                   
+            pInfo.append(proc)
                     
                                 
         self.processes = pInfo
@@ -41,15 +47,17 @@ class SyetmeInfomation:
         self.cpus = []
         cores = psutil.cpu_percent(percpu=True)
         for core in range(len(cores)):
-            self.cpus.append([core, cores[core]])
+            self.cpus.append( {'numOfCore' : core, 
+                               'clock' :cores[core],
+                               }
+                             ) 
             
     def memoryUpdate(self):
-        memory = psutil.virtual_memory()
-        
-        self.memory = []
-        self.memory.append('{:,}'.format(int(memory.total / self.mega)))
-        self.memory.append('{:,}'.format(int(memory.available / self.mega)))
-        self.memory.append('{:,}'.format(int(memory.active / self.mega)))
+        memory = psutil.virtual_memory()        
+        self.memory = {'total' : '{:,}'.format(int(memory.total / self.mega)), 
+                       'avail' : '{:,}'.format(int(memory.available / self.mega)),
+                       'active' : '{:,}'.format(int(memory.active / self.mega)),
+                       }
 
     
     def update(self):

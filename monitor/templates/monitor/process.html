@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 
-
 {% block title %} test_title {% endblock %}
 {% block script %}
 <script type="text/JavaScript">
@@ -32,9 +31,12 @@
 </script>
 {% endblock %}
 
+{% block style %}
+<link rel="stylesheet" type="text/css" href="{% static 'monitor/style.css' %}" />
+{% endblock %}
+
 
 {% block content %}
-<link rel="stylesheet" type="text/css" href="{% static 'monitor/style.css' %}" />
 
 <body onload="JavaScript:loop(1000);">
 	<div class="system", id="system">

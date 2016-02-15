@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-
 <html>
 <head>
 	<title> {% block title %}{% endblock %}</title>
+	{% block style %} {% endblock %}
 	{% block script %} {% endblock %}
-	{% block style %}{% endblock %}
+	
 </head>
 
 {% block content %}{% endblock %}
