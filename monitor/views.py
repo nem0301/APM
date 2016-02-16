@@ -57,7 +57,7 @@ class SyetmeInfomation:
         self.memory = {'total' : '{:,}'.format(int(memory.total / self.mega)), 
                        'avail' : '{:,}'.format(int(memory.available / self.mega)),
                        'active' : '{:,}'.format(int(memory.active / self.mega)),
-                       }
+                       }    
 
     
     def update(self):
@@ -65,19 +65,23 @@ class SyetmeInfomation:
         self.cpuUpdate()
         self.memoryUpdate()
         
-
-class MonitorView(TemplateView):    
-    systeminfo = SyetmeInfomation()
-    
-    def get(self, request):        
+    def __del__(self):
+        pass
         
-        sysinfo = self.systeminfo        
+
+class MonitorView(TemplateView):        
+    
+    def get(self, request):
+        sysinfo = SyetmeInfomation()                
         sysinfo.update() 
                
         data = { 'processes' : sysinfo.processes,
                  'cpus' : sysinfo.cpus,          
                  'memory' : sysinfo.memory,              
                  }
+        
+        sysinfo.__del__()
+        
         return render(request, 'monitor/index.html', data)    
     
 class ProcessView(TemplateView):
