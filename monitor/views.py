@@ -4,16 +4,8 @@ from django.views.generic.base import TemplateView
 import psutil, datetime
 import threading, time
 
-iii = 0
 
-def loop():
-    global iii
-    while True:
-        iii += 1
-        time.sleep(1)
 
-th = threading.Thread(target=loop, args=())
-th.start()
 
 refreshInterval = 1000
 
@@ -45,6 +37,12 @@ class SyetmeInfomation:
         
     def getName(self):
         return self.name
+    
+    def getProcessByPid(self, pid):
+        for proc in psutil.process_iter():
+            if int(proc.pid) == int(pid):             
+                return proc
+        return False 
     
     def processUpdate(self):
         pInfo = []
@@ -100,13 +98,23 @@ class SyetmeInfomation:
     def __del__(self):
         pass
     
+sysInfo = SyetmeInfomation()
+
+
+def loop():
+    global sysInfo
+    while True:
+        sysInfo.update()
+        time.sleep(1)
+
+th = threading.Thread(target=loop, args=())
+th.start()
         
 
 class MonitorView(TemplateView):        
     def get(self, request):
-        sysinfo = SyetmeInfomation()                
-        sysinfo.update() 
-        print (iii)
+        global sysInfo
+        sysinfo = sysInfo
         data = {'processes' : sysinfo.allProcesses,
                 'processesByCpu' : sysinfo.processesByCpu,
                 'processesByMemory' : sysinfo.processesByMemory,
@@ -122,14 +130,11 @@ class MonitorView(TemplateView):
 class ProcessView(TemplateView):
     
     def get(self, request, pid):
-        proc = psutil.Process(int(pid))
+        global sysInfo        
+        proc = sysInfo.getProcessByPid(pid)
+        if (proc == False):
+            print ("There is no Process with the pid : %d" % int(pid))
         parentName = "None"
-        cpu_percent = 0.0
-        
-        for p in psutil.process_iter():
-            if int(p.pid) == int(pid):                
-                cpu_percent = p.cpu_percent()
-                break
         
         #This process is first process after system boot. There is No parent process
         if int(proc.ppid()) != 0:
@@ -157,7 +162,7 @@ class ProcessView(TemplateView):
                   'num_threads' : proc.num_threads(),
                   'threads' : proc.threads(),                  
                   'cpu_times' : proc.cpu_times(),
-                  'cpu_percent' : cpu_percent,
+                  'cpu_percent' : proc.cpu_percent(),
                   'cpu_affinity' : proc.cpu_affinity(),
                   'memory_info_ex' : proc.memory_info_ex(),
                   'memory_percent' : proc.memory_percent(),
