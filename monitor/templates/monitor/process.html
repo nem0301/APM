@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
 
-{% block title %} test_title {% endblock %}
+{% block title %} {{name}} {% endblock %}
 {% block script %}
 <script type="text/JavaScript">
 
@@ -32,42 +31,141 @@
 {% endblock %}
 
 {% block style %}
+{% load staticfiles %}
 <link rel="stylesheet" type="text/css" href="{% static 'monitor/style.css' %}" />
 {% endblock %}
 
 
 {% block content %}
 
-<body onload="JavaScript:loop(1000);">
+<body onload="JavaScript:loop({{refreshInterval}});">
 	<div class="system", id="system">
-		<p> {{name}} </p>
-		<p> {{pid}} </p>
-		<p> {{ppid}} </p>
-		<p> {{exe}} </p>
-		<p> {{cmdline}} </p>
-		<p> {{created}} </p>
-		<p> {{status}} </p>
-		<p>	{{cwd}} </p>
-		<p>	{{username}} </p>
-		<p>	{{uids}} </p>
-		<p>	{{gids}} </p>
-		<p> {{nice}} </p>
-		<p> {{ionice}} </p>
-		<p> {{rlimit}} </p>
-		<p> {{io_counters}} </p>
-		<p> {{num_ctx_switches}} </p>
-		<p> {{num_fds}} </p>
-		<p> {{num_threads}} </p>
-		<p> {{threads}} </p>		
-		<p> {{cpu_times}} </p>
-{#		<p> {{cpu_percent}} </p>#}
-		<p> {{cpu_affinity}} </p>
-		<p> {{memory_info_ex}} </p>
-		<p> {{memory_percent}} </p>
-		<p> {{children}} </p>
-		<p> {{open_files}} </p>
-		<p> {{connections}} </p>
-		<p> {{is_running}} </p>
+		<div class="process block">
+			<h3>Process Basic Infomation</h3>
+			<p> Name : {{name}} (pid : {{pid}}) </p>			
+			<p> Execution Path : {{exe}} </p>
+			<p>cmd :  
+			{% for each in cmdline %}
+				{{each}}
+			{% endfor %} 
+			</p>
+			<p> Created Since {{created}}</p>
+			<p> User Name : {{username}} </p>			
+			
+		</div>
+		
+		<div class="process block">
+			<h3>Process Addtional Infomation</h3>			
+			<p> Parent Process Name : <a href="/monitor/{{ppid}}">{{parent_name}}</a> (ppid : {{ppid}})</p>
+			<p class="tableTitle"> I/O Counters</p>
+			<table class="addtionalInfo">
+				<tr>
+					<th> Read Count</th>
+					<th> Write Count</th>
+					<th> Read Bytes</th>
+					<th> Write Bytes</th>
+				</tr>
+				<tr class="value">
+					<td> {{ io_counters.read_count }} </td>
+					<td> {{ io_counters.write_count }} </td>
+					<td> {{ io_counters.read_bytes }} </td>
+					<td> {{ io_counters.write_bytes }} </td>
+				</tr>				
+			</table>
+			<p style="font-size:13px"> Context Switching :  
+			Voluntary( {{num_ctx_switches.voluntary}} ), 
+			Involuntary( {{num_ctx_switches.involuntary}} )</p>
+			
+		
+		</div>
+		
+		<div class="halfblock">
+			<h3>Thread Infomation</h3>
+			<p> Number of Threads : {{num_threads}} </p>
+			<table>
+				<tr>
+					<th> ID </th>
+					<th> User Time </th>
+					<th> System Time </th>					
+				</tr>
+				{% for each in threads %}
+				<tr class="value">					
+					<td> {{each.id}} </td>
+					<td> {{each.user_time}} </td>
+					<td> {{each.system_time}} </td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+		
+		<div class="halfblock">
+			<h3>Opened File Infomation</h3>
+			<p> Number of Files : {{num_fds}} </p>
+			<table>
+				<tr>
+					<th> FD </th>
+					<th> Path </th>										
+				</tr>
+				{% for each in open_files %}
+				<tr class="value", style="font-size:13px">					
+					<td> {{each.fd}} </td>					
+					<td> {{each.path}} </td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
+		
+		<div class="halfblock">
+			<h3>CPU & Memory Infomation</h3>
+			<p> Usage of CPU : {{cpu_percent}}% </p>
+			<p>  
+				CPU Times : ( user : {{cpu_times.user}}, system : {{cpu_times.system}} )
+			</p>
+			
+			<table>
+				<td>
+				</td>
+			</table>
+		</div>
+	
+		<div class="test">	
+		
+			<p>name : {{name}} </p>
+			<p>pid : {{pid}} </p>
+			<p>parent_name : {{parent_name}}</p>
+			<p>ppid : {{ppid}} </p>
+			<p>exe : {{exe}} </p>
+			<p>cmdline : {{cmdline}} </p>
+			<p>created : {{created}} </p>
+			<p>status : {{status}} </p>
+			<p>cwd	: {{cwd}} </p>
+			<p>username	: {{username}} </p>
+			<p>uids	: {{uids}} </p>
+			<p>gids	: {{gids}} </p>
+			<p>nice : {{nice}} </p>
+			<p>ionice : {{ionice}} </p>
+			<p>rlimit : {{rlimit}} </p>
+			<p>io_counters : {{io_counters}} </p>
+			<p>num_ctx_switches : {{num_ctx_switches}} </p>
+			<p>num fds : {{num_fds}} </p>
+			<p>num threads : {{num_threads}} </p>
+			<p>threads</p>			 
+			{% for each in threads %}
+			<p style="font-size:12px"> {{each}} </p>
+			{% endfor %}		
+			<p>cputimes : {{cpu_times}} </p>
+			<p> cpu_percent {{cpu_percent}} </p>
+			<p>cpu_affinity : {{cpu_affinity}} </p>
+			<p>memory_info_ex : {{memory_info_ex}} </p>
+			<p>memory_percent : {{memory_percent}} </p>
+			<p>chilndren : {{children}} </p>
+			<p>openn_files</p> 
+			{% for each in open_files %}
+			<p style="font-size:12px"> {{each}} </p>
+			{% endfor %}
+			<p>connections : {{connections}} </p>
+			<p>is_running : {{is_running}} </p>
+		</div>
 	</div>
 	
 </body>
