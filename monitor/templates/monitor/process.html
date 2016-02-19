@@ -5,12 +5,10 @@
 <script type="text/JavaScript">
 
 	function loop(t){	
-		setInterval(loadDoc, t);
+		setInterval( function() { loadDoc("system"); } , t);
 	}
 	
-	function loadDoc() {
-		
-			
+	function loadDoc(id) {		
 		var xhttp;	
 
 	    xhttp = new XMLHttpRequest();
@@ -18,13 +16,12 @@
 	    xhttp.onreadystatechange = function() {
 	    	if (xhttp.readyState == 4 &&
 	    		xhttp.status == 200){
-	    		document.getElementById("system").innerHTML = xhttp.responseText; 
+	    		document.getElementById(id).innerHTML = xhttp.responseText; 
 	    	}
 	    };
 	    
 	    xhttp.open("GET", window.location.href, true);
-	    xhttp.send();
-		  
+	    xhttp.send();		  
 	}
     
 </script>
@@ -76,6 +73,24 @@
 			Voluntary( {{num_ctx_switches.voluntary}} ), 
 			Involuntary( {{num_ctx_switches.involuntary}} )</p>
 			
+			<p><b> Children </b></p>
+			<div class="innerblock">
+				<table style="font-size:12px">
+					<tr>
+						<th> PID </th>
+						<th> Name </th>
+					</tr>
+					
+					{% for each in children %}
+					<tr>
+						<td style="text-align:right"> {{each.pid}} </td>
+						<td style="padding-left:10px"><a href="/monitor/{{each.pid}}"> {{each.name}} </a> </td>
+					</tr>
+					{% endfor %}
+	
+				</table>
+			</div>
+			
 		
 		</div>
 		
@@ -122,47 +137,59 @@
 				CPU Times : ( user : {{cpu_times.user}}, system : {{cpu_times.system}} )
 			</p>
 			
-			<table>
-				<td>
-				</td>
+			<p> Usage of Memory : {{memory_percent}} </p>
+			<table class="cpuAndMem">
+				<tr>
+					<th>Kind</th>
+					<th>Bytes</th>
+				</tr>
+				<tr>
+					<td>rss</td>
+					<td style="text-align:right">{{memory_info_ex.rss}}</td>
+				</tr>
+				<tr>
+					<td>vms</td>
+					<td style="text-align:right">{{memory_info_ex.vms}}</td>
+				</tr>
+				<tr>
+					<td>shared</td>
+					<td style="text-align:right">{{memory_info_ex.shared}}</td>
+				</tr>
+				<tr>
+					<td>text</td>
+					<td style="text-align:right">{{memory_info_ex.text}}</td>
+				</tr>
+				<tr>
+					<td>lib</td>
+					<td style="text-align:right">{{memory_info_ex.lib}}</td>
+				</tr>
+				<tr>
+					<td>data</td>
+					<td style="text-align:right">{{memory_info_ex.data}}</td>
+				</tr>
+				<tr>
+					<td>dirty</td>
+					<td style="text-align:right">{{memory_info_ex.dirty}}</td>
+				</tr>
 			</table>
 		</div>
-	
-		<div class="test">	
 		
-			<p>name : {{name}} </p>
-			<p>pid : {{pid}} </p>
-			<p>parent_name : {{parent_name}}</p>
-			<p>ppid : {{ppid}} </p>
-			<p>exe : {{exe}} </p>
-			<p>cmdline : {{cmdline}} </p>
-			<p>created : {{created}} </p>
+		<div class="halfblock">
+			{% for each in connections %}
+				{% for e in each %}
+					<p> {{e}} </p>
+				{% endfor %}
+				<hr>
+			{% endfor %}					
+		</div>	
+		
+		<div class="test">
 			<p>status : {{status}} </p>
-			<p>cwd	: {{cwd}} </p>
-			<p>username	: {{username}} </p>
 			<p>uids	: {{uids}} </p>
 			<p>gids	: {{gids}} </p>
 			<p>nice : {{nice}} </p>
-			<p>ionice : {{ionice}} </p>
-			<p>rlimit : {{rlimit}} </p>
-			<p>io_counters : {{io_counters}} </p>
-			<p>num_ctx_switches : {{num_ctx_switches}} </p>
-			<p>num fds : {{num_fds}} </p>
-			<p>num threads : {{num_threads}} </p>
-			<p>threads</p>			 
-			{% for each in threads %}
-			<p style="font-size:12px"> {{each}} </p>
-			{% endfor %}		
-			<p>cputimes : {{cpu_times}} </p>
-			<p> cpu_percent {{cpu_percent}} </p>
+			<p>ionice : {{ionice}} </p>		
 			<p>cpu_affinity : {{cpu_affinity}} </p>
-			<p>memory_info_ex : {{memory_info_ex}} </p>
-			<p>memory_percent : {{memory_percent}} </p>
-			<p>chilndren : {{children}} </p>
-			<p>openn_files</p> 
-			{% for each in open_files %}
-			<p style="font-size:12px"> {{each}} </p>
-			{% endfor %}
 			<p>connections : {{connections}} </p>
 			<p>is_running : {{is_running}} </p>
 		</div>

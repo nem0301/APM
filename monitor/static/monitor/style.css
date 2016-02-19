@@ -89,7 +89,7 @@ div.halfblock{
 	width:45%;
 	float: left;
 	background:cyan;
-	overflow:auto;
+	overflow:auto;	
 }
 
 div.fullblock{	
@@ -102,6 +102,22 @@ div.fullblock{
 	padding-bottom:0px;
 }
 
+p {
+	margin-top:2px; 
+	margin-bottom:2px;
+}
+
+table.cpuAndMem {
+	font-size:13px; 
+	margin-top:0;
+	margin-bottom:0;
+	width:60%;	
+}
+
+div.innerblock {
+	height:120px;
+	overflow:auto;
+}
 
 
 

@@ -1,116 +1,13 @@
 from django.shortcuts import render
 from models import Monitor
 from django.views.generic.base import TemplateView
-import psutil, datetime
-import threading, time
+import threading, datetime
+from SystemInformation import SystemInformation 
+sysInfo = SystemInformation()
 
-
-
-
-refreshInterval = 1000
-
-class SyetmeInfomation:
-    
-    kilo = 1024
-    mega = kilo * kilo
-    giga = mega * kilo  
-    
-    def __init__(self):
-        self.name = 'test'
-        self.allProcesses = []
-        self.processesByMemory = []
-        self.processesByCpu = []
-        self.cpus = []
-        self.memory = {}
-        
-    def byName(self, item):
-        return item['name']
-    
-    def byPID(self, item):
-        return item['pid']            
-        
-    def byCpu(self, item):
-        return item['cpu_percent']
-    
-    def byRam(self, item):
-        return item['mem_percent']
-        
-    def getName(self):
-        return self.name
-    
-    def getProcessByPid(self, pid):
-        for proc in psutil.process_iter():
-            if int(proc.pid) == int(pid):             
-                return proc
-        return False 
-    
-    def processUpdate(self):
-        pInfo = []
-        for proc in psutil.process_iter():            
-            memory = {'rss' : '{:,}'.format(proc.memory_info().rss),
-                      'vms' : '{:,}'.format(proc.memory_info().vms),
-                      'rssM' : '{:,}'.format(proc.memory_info().rss / self.mega),
-                      'vmsM' : '{:,}'.format(proc.memory_info().vms / self.mega),
-                      }
-            proc = {'name' : proc.name(),
-                    'pid' : proc.pid, 
-                    'cpu_percent' : proc.cpu_percent(), 
-                    'memory' : memory,              
-                    'mem_percent' : "%05.2f" % proc.memory_percent(),
-                    }                   
-            pInfo.append(proc)
-                    
-        
-        pInfo.sort(key=self.byName, reverse=False)
-        pInfo.sort(key=self.byPID, reverse=True)                        
-        self.allProcesses = pInfo[:]
-        
-        pInfo.sort(key=self.byCpu, reverse=True)
-        self.processesByCpu = pInfo[:]
-        self.processesByCpu = self.processesByCpu[:5]
-        
-        pInfo.sort(key=self.byRam, reverse=True)
-        self.processesByMemory = pInfo[:] 
-        self.processesByMemory = self.processesByMemory[:5]         
-        
-    def cpuUpdate(self):
-        self.cpus = []        
-        cores = psutil.cpu_percent(percpu=True)        
-        for core in range(len(cores)):
-            self.cpus.append( {'numOfCore' : core, 
-                               'clock' :cores[core],
-                               }
-                             ) 
-            
-    def memoryUpdate(self):
-        memory = psutil.virtual_memory()        
-        self.memory = {'total' : '{:,}'.format(int(memory.total / self.mega)), 
-                       'avail' : '{:,}'.format(int(memory.available / self.mega)),
-                       'active' : '{:,}'.format(int(memory.active / self.mega)),
-                       }    
-
-    
-    def update(self):
-        self.processUpdate()
-        self.cpuUpdate()
-        self.memoryUpdate()
-        
-    def __del__(self):
-        pass
-    
-sysInfo = SyetmeInfomation()
-
-
-def loop():
-    global sysInfo
-    while True:
-        sysInfo.update()
-        time.sleep(1)
-
-th = threading.Thread(target=loop, args=())
+th = threading.Thread(target=sysInfo.loopThread, args=(1,))
 th.start()
         
-
 class MonitorView(TemplateView):        
     def get(self, request):
         global sysInfo
@@ -120,12 +17,12 @@ class MonitorView(TemplateView):
                 'processesByMemory' : sysinfo.processesByMemory,
                 'cpus' : sysinfo.cpus,          
                 'memory' : sysinfo.memory,
-                'refreshInterval': 2000,              
+                'refreshInterval': 1000,              
                  }
         
         sysinfo.__del__()
         
-        return render(request, 'monitor/index.html', data)    
+        return render(request, 'monitor/overall.html', data)    
     
 class ProcessView(TemplateView):
     
@@ -138,9 +35,20 @@ class ProcessView(TemplateView):
         
         #This process is first process after system boot. There is No parent process
         if int(proc.ppid()) != 0:
-            parentProcess = psutil.Process(int(proc.ppid()))
+            parentProcess = sysInfo.getProcessByPid(int(proc.ppid()))
             parentName = parentProcess.name()
-                     
+                    
+        memory_info_ex = proc.memory_info_ex()        
+        memory_info =  {'rss' : '{:,}'.format(memory_info_ex.rss),
+                        'vms' : '{:,}'.format(memory_info_ex.vms),
+                        'shared' : '{:,}'.format(memory_info_ex.shared),
+                        'text' : '{:,}'.format(memory_info_ex.text),
+                        'lib' : '{:,}'.format(memory_info_ex.lib),
+                        'data' : '{:,}'.format(memory_info_ex.data),
+                        'dirty' : '{:,}'.format(memory_info_ex.dirty),
+                        }
+        
+        
         output = {'name'    : proc.name(),
                   'pid'     : proc.pid,
                   'parent_name' : parentName,
@@ -154,8 +62,7 @@ class ProcessView(TemplateView):
                   'uids'    : proc.uids(),
                   'gids'    : proc.gids(),
                   'nice'    : proc.nice(),
-                  'ionice'  : proc.ionice(),
-                  'rlimit'  : proc.rlimit(psutil.RLIMIT_FSIZE),
+                  'ionice'  : proc.ionice(),                  
                   'io_counters' : proc.io_counters(),
                   'num_ctx_switches' : proc.num_ctx_switches(),
                   'num_fds' : proc.num_fds(),
@@ -164,13 +71,17 @@ class ProcessView(TemplateView):
                   'cpu_times' : proc.cpu_times(),
                   'cpu_percent' : proc.cpu_percent(),
                   'cpu_affinity' : proc.cpu_affinity(),
-                  'memory_info_ex' : proc.memory_info_ex(),
+                  'memory_info_ex' : memory_info,
                   'memory_percent' : proc.memory_percent(),
                   'children' : proc.children(),              
                   'open_files' : proc.open_files(),     
                   'connections' : proc.connections(),
                   'is_running' : proc.is_running(), 
-                  'refreshInterval' : 100000,            
+                  'refreshInterval' : 1000,            
                   
                   }
         return render(request, 'monitor/process.html', output)
+
+
+
+

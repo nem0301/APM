@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+
+{% block title %} Application Performance Management {% endblock %}
+
+{% block script %}
+<script type="text/JavaScript">
+
+	function loop(t){	
+		setInterval(loadDoc, t);
+	}
+	
+	function loadDoc() {
+		
+			
+		var xhttp;	
+
+	    xhttp = new XMLHttpRequest();
+	    
+	    xhttp.onreadystatechange = function() {
+	    	if (xhttp.readyState == 4 &&
+	    		xhttp.status == 200){
+	    		document.getElementById("system").innerHTML = xhttp.responseText; 
+	    	}
+	    };
+	    
+	    xhttp.open("GET", window.location.href, true);
+	    xhttp.send();
+		  
+	}
+    
+</script>
+{% endblock %}
+
+{% block style %}
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static 'monitor/style.css' %}" />
+{% endblock %}
+
+{% block content %}
+
+<body onload="JavaScript:loop({{refreshInterval}});">
+	<div class="system", id="system">				
+		<div class="cpu block">
+			<p><b>CORE Infomation</b></p>
+			{% for core in cpus%}
+			<h3> CORE {{core.numOfCore}} : {{core.clock}}  </h3>
+			{% endfor %}		
+			
+			<p><b>Top 5 Process Usage of CPU</b></p>
+			
+			<table class="cpu">
+				<tr>
+					<th>Process</th>
+					<th>Usage of CPU</th>
+				</tr>	
+			
+				{% for p in processesByCpu %}							
+				<tr>						
+					<td><a href="/monitor/{{p.pid}}">{{p.name}}</a></td>
+					<td class="value">{{p.cpu_percent}} %</td>				
+				</tr>
+				{% endfor %}
+			</table>		
+		</div>	
+	
+		<div class="memory block">
+			<p><b>Memory Infomation</b></p>
+			<p style="text-align:right; margin-top:0; margin-bottom:0"> unit : Bytes</p>
+			<table>		
+				<tr>	
+					<th> Total </th>
+					<th> Available </th>
+					<th> Active </th>
+				</tr>
+				<tr>				
+					<td class="value">{{memory.total}} M</td>
+					<td class="value">{{memory.avail}} M</td>
+					<td class="value">{{memory.active}} M</td>					
+				</tr>
+			</table>
+			
+			<p><b>Top 5 Process Usage of Memory</b></p>
+			<table class="memory">
+				<tr>
+					<th> Process </th>
+					<th> RSS </th>
+					<th> VMS </th>
+				</tr>	
+			
+				{% for p in processesByMemory %}											
+				<tr>						
+					<td><a href="/monitor/{{p.pid}}">{{p.name}}</a></td>
+					<td class="value">{{p.memory.rssM}} M({{p.mem_percent}}%) </td>
+					<td class="value">{{p.memory.vmsM}} M</td>									
+				</tr>
+				{% endfor %}
+			</table>		
+		</div>
+		
+		<div class="allProcesses">
+			<p><b>List of All Processes</b></p>
+			
+			<table>
+				<tr>
+					<th> Name </th>
+					<th> PID </th>
+					<th> % Usage of CPU </th>
+					<th> RSS (Bytes)</th>
+					<th> VMS (Bytes)</th>
+					<th> % Usage of Memory </th>
+				</tr>
+				
+				{% for p in processes %}
+				<tr>
+					<td><a href="/monitor/{{p.pid}}"> {{p.name}} </a></td>
+					<td class="value"> {{p.pid}} </td>
+					<td class="value"> {{p.cpu_percent}} % </td>
+					<td class="value"> {{p.memory.rss}} </td>
+					<td class="value"> {{p.memory.vms}} </td>
+					<td class="value"> {{p.mem_percent}} % </td>
+				</tr>					
+				{% endfor %}
+			</table>		
+		</div>
+		
+	</div>
+	
+</body>
+
+{% endblock %}
+
